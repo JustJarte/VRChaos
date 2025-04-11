@@ -1,0 +1,25 @@
+# Unity / Visual Studio
+[Ll]ibrary/
+[Tt]emp/
+[Bb]uild/
+[Bb]uilds/
+[Pp]ackages/
+Obj/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.pidb
+*.booproj
+*.svd
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Fusion / Photon sensitive configs
+Assets/Photon/Fusion/Resources/PhotonAppSettings.asset
