@@ -13,8 +13,8 @@ TagManager:
   - UI
   - Locomotion
   - 'InvisibleForLocalPlayer '
-  - 
-  - 
+  - Player
+  - PlayerHand
   - 
   - 
   - 

@@ -30,7 +30,7 @@ public class UpdateConnectionStatus : MonoBehaviour, INetworkRunnerCallbacks
             audioSource = GetComponent<AudioSource>();
 
         var connectionManager = runner.GetComponent<ConnectionManager>();
-        connectionManager.onWillConnect.AddListener(OnWillConnect);
+        //connectionManager.onWillConnect.AddListener(OnWillConnect);
     }
 
     protected virtual void FindRunner()

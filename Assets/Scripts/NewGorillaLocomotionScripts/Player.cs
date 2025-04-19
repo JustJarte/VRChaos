@@ -1,8 +1,14 @@
 ﻿namespace GorillaLocomotion
 {
     using UnityEngine;
+    using UnityEngine.InputSystem;
+    using UnityEngine.XR.Interaction.Toolkit;
+    using UnityEngine.XR;
+    using Fusion.XR.Shared.Rig;
+    using Fusion;
+    using System.Collections.Generic;
 
-    public class Player : MonoBehaviour
+    public class Player : NetworkBehaviour
     {
         private static Player _instance;
 
@@ -16,7 +22,7 @@
 
         public Transform rightHandTransform;
         public Transform leftHandTransform;
-
+        
         private Vector3 lastLeftHandPosition;
         private Vector3 lastRightHandPosition;
         private Vector3 lastHeadPosition;
@@ -41,6 +47,8 @@
         private bool jumpHandIsLeft;
         private Vector3 lastPosition;
 
+        private NetworkRunner runner;
+
         public Vector3 rightHandOffset;
         public Vector3 leftHandOffset;
 
@@ -50,6 +58,58 @@
         public bool wasRightHandTouching;
 
         public bool disableMovement = false;
+
+        public LayerMask affectablePlayerLayer;
+
+        public XRControllerInputDevice leftHandDevice;
+        public XRControllerInputDevice rightHandDevice;
+        public List<GameObject> playerHands = new List<GameObject>();
+        private bool leftTriggerHeld = false;
+        private bool rightTriggerHeld = false;
+        [Networked] public bool IsAfflicted { get; set; }
+        private TickTimer afflictionTimer;
+
+        #region Alien Unique Variables
+        public NetworkPrefabRef beaconPrefab;
+        private NetworkObject activeBeacon;
+        private float beaconCooldown = 5.0f;
+        private float lastBeaconDropTime = 10.0f;
+        private bool justRecalled = false;
+        #endregion
+
+        #region Bigfoot Unique Variables
+        private float slamCooldown = 5.0f;
+        private float lastSlamTime = 10.0f;
+
+        private float slamRadius = 5.0f;
+        private float slamForce = 10.0f;
+        #endregion
+
+        #region Frogman Unique Variables
+        private float spellCooldown = 5.0f;
+        private float spellRange = 10.0f;
+        private float effectDuration = 2.0f;
+        private float lastSpellUseTime = 10.0f;
+        public Transform wandTipPoint;
+        public NetworkPrefabRef magicProjectilePrefab;
+        #endregion
+
+        #region Mothman Unique Variables
+        private int currentWingFlapsRemaining = 5;
+        private int maxWingFlaps = 5;
+
+        private bool hasRecentlyFlapped = false;
+        private float flapCooldown = 0.25f;
+        private float lastFlapTime = 0.0f;
+
+        private float glideFallSpeed = -2.0f;
+
+        private Vector3 previousLeftHandLocalPos;
+        private Vector3 previousRightHandLocalPos;
+        #endregion
+
+        private CryptidType cryptidType;
+        private CryptidCharacterType cryptidCharacterType;
 
         private void Awake()
         {
@@ -64,17 +124,22 @@
             InitializeValues();
         }
 
-        /*private void Start()
+        public override void Spawned()
         {
-            if (!VRModeManager.UseGorillaLocomotion)
-            {
-                enabled = false;
-                return;
-            }
-        }*/
+            runner = Runner;
+
+            if (!HasInputAuthority) return;
+        }
 
         public void InitializeValues()
         {
+            var cryptidType = GetComponent<CryptidType>();
+
+            if (cryptidType != null)
+            {
+                cryptidCharacterType = cryptidType.cryptidCharacterType;
+            }
+
             playerRigidBody = GetComponent<Rigidbody>();
             velocityHistory = new Vector3[velocityHistorySize];
             lastLeftHandPosition = leftHandFollower.transform.position;
@@ -82,6 +147,9 @@
             lastHeadPosition = headCollider.transform.position;
             velocityIndex = 0;
             lastPosition = transform.position;
+
+            previousLeftHandLocalPos = headCollider.transform.InverseTransformPoint(leftHandTransform.position);
+            previousRightHandLocalPos = headCollider.transform.InverseTransformPoint(rightHandTransform.position);
         }
 
         private Vector3 CurrentLeftHandPosition()
@@ -124,6 +192,16 @@
             RaycastHit hitInfo;
 
             bodyCollider.transform.eulerAngles = new Vector3(0, headCollider.transform.eulerAngles.y, 0);
+
+            if (IsAfflicted)
+            {
+                //Show affliction effect here
+                return;
+            }
+            else
+            {
+                //Remove affliction effect here
+            }
 
             //left hand
 
@@ -189,7 +267,11 @@
                 }
             }
 
-            if (rigidBodyMovement != Vector3.zero)
+            if (justRecalled)
+            {
+                justRecalled = false;
+            }
+            else if (rigidBodyMovement != Vector3.zero)
             {
                 transform.position = transform.position + rigidBodyMovement;
             }
@@ -257,11 +339,285 @@
                 rightHandColliding = false;
             }
 
+            if (cryptidCharacterType == CryptidCharacterType.Bigfoot)
+            {
+                HandleBigfootAbility();
+            }
+            else if (cryptidCharacterType == CryptidCharacterType.Mothman)
+            {
+                HandleMothmanAbility();
+            }
+            else if (cryptidCharacterType == CryptidCharacterType.Alien)
+            {
+                HandleAlienAbility();
+            }
+            else if (cryptidCharacterType == CryptidCharacterType.Frogman)
+            {
+                HandleFrogmanAbility();
+            }
+
             leftHandFollower.position = lastLeftHandPosition;
             rightHandFollower.position = lastRightHandPosition;
 
             wasLeftHandTouching = leftHandColliding;
             wasRightHandTouching = rightHandColliding;
+
+            previousLeftHandLocalPos = headCollider.transform.InverseTransformPoint(leftHandTransform.position);
+            previousRightHandLocalPos = headCollider.transform.InverseTransformPoint(rightHandTransform.position);
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            if (IsAfflicted && afflictionTimer.Expired(Runner))
+            {
+                IsAfflicted = false;
+            }
+        }
+
+        private void HandleBigfootAbility()
+        {
+            if (lastSlamTime < slamCooldown)
+            {
+                lastSlamTime += Time.deltaTime;
+            }
+            else
+            {
+                if (CheckIfGrounded() && CheckIfPlayerHoldingTriggers())
+                {
+                    bool bothHandsSlammedDown = wasLeftHandTouching && wasRightHandTouching;
+
+                    if (bothHandsSlammedDown)
+                    {
+                        Debug.Log("Officially using slam ability!");
+
+                        lastSlamTime = 0.0f;
+
+                        Vector3 origin = transform.position;
+
+                        Collider[] hitColliders = Physics.OverlapSphere(origin, slamRadius, affectablePlayerLayer);
+
+                        foreach (var hit in hitColliders)
+                        {
+                            if (hit.attachedRigidbody && hit.gameObject != gameObject)
+                            {
+                                Vector3 direction = (hit.transform.position - origin).normalized;
+                                hit.attachedRigidbody.AddForce(direction * slamForce, ForceMode.Impulse);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void HandleMothmanAbility()
+        {
+            if (CheckIfGrounded() && currentWingFlapsRemaining < maxWingFlaps)
+            {
+                currentWingFlapsRemaining = maxWingFlaps;
+            }
+
+            var currentLeftLocal = headCollider.transform.InverseTransformPoint(leftHandTransform.position);
+            var currentRightLocal = headCollider.transform.InverseTransformPoint(rightHandTransform.position);
+
+            float leftDownSpeed = previousLeftHandLocalPos.y - currentLeftLocal.y;
+            float rightDownSpeed = previousRightHandLocalPos.y - currentRightLocal.y;
+
+           // Debug.Log("LEft Down Speed: " + leftDownSpeed);
+            //Debug.Log("Right Down Speed: " + rightDownSpeed);
+
+            bool bothHandsFlapping = leftDownSpeed > 0.0001f && rightDownSpeed > 0.0001f;
+            //bool handsRaised = leftVelocity > 0.005f && rightVelocity > 0.005f;
+
+            bool handsRaised = false;
+
+            if (lastFlapTime < flapCooldown)
+            {
+                lastFlapTime += Time.deltaTime;
+            }
+            else
+            {
+                if (bothHandsFlapping && !hasRecentlyFlapped && currentWingFlapsRemaining > 0)
+                {
+                    Vector3 headForward = headCollider.transform.forward;
+                    Vector3 flapDirection = (Vector3.up * 1.2f + headForward * 0.8f).normalized;
+
+                    playerRigidBody.velocity = flapDirection * 10.0f;
+
+                    currentWingFlapsRemaining--;
+                    lastFlapTime = 0.0f;
+                    hasRecentlyFlapped = true;
+
+                    Debug.Log("MOTHMAN IS FLAPPING! FLAPS REMAINING: " + currentWingFlapsRemaining);
+                }
+                else if (!bothHandsFlapping)
+                {
+                    hasRecentlyFlapped = false;
+                }
+            }
+
+            if (!handsRaised && currentWingFlapsRemaining < maxWingFlaps)
+            {
+                if (playerRigidBody.velocity.y < glideFallSpeed)
+                {
+                    playerRigidBody.velocity = new Vector3(playerRigidBody.velocity.x, glideFallSpeed, playerRigidBody.velocity.z);
+                }
+            }
+        }
+
+        private void HandleFrogmanAbility()
+        {
+            if (lastSpellUseTime < spellCooldown)
+            {
+                lastSpellUseTime += Time.deltaTime;
+            }
+            else
+            {
+                //Maybe add a condition to check if player is holding Trigger to "prime" wand
+                if (CheckIfPrimaryButtonPressed())
+                {
+                    lastSpellUseTime = 0.0f;
+
+                    NetworkObject magicProjectile = runner.Spawn(
+                        magicProjectilePrefab,
+                        wandTipPoint.position,
+                        Quaternion.LookRotation(wandTipPoint.forward),
+                        Object.InputAuthority);
+
+                    var rb = magicProjectile.GetComponent<Rigidbody>();
+
+                    if (rb != null)
+                    {
+                        rb.velocity = wandTipPoint.forward * 10.0f;
+                    }
+
+                    Debug.Log("Frogman launched a spell!");
+                }
+            }
+        }
+
+        public void ApplyMagicEffect(float duration)
+        {
+            if (!HasInputAuthority) return;
+
+            IsAfflicted = true;
+            afflictionTimer = TickTimer.CreateFromSeconds(Runner, duration);
+
+            Debug.Log($"Player is stunned for {duration} seconds!");
+        }
+
+        private void HandleAlienAbility()
+        {
+            if (activeBeacon != null)
+            {
+                if (CheckIfSecondaryButtonPressed())
+                {
+                    transform.position = new Vector3(activeBeacon.transform.position.x, transform.position.y, activeBeacon.transform.position.z);
+
+                    Debug.Log("Recalled to beacon!");
+
+                    runner.Despawn(activeBeacon);
+                    activeBeacon = null;
+
+                    justRecalled = true;
+                }
+            }
+            else
+            {
+                if (CheckIfSecondaryButtonPressed())
+                {
+                    Debug.Log("No active beacon to recall!");
+
+                    SendHapticImpulse(leftHandDevice, 0.3f, 0.15f);
+                    SendHapticImpulse(rightHandDevice, 0.3f, 0.15f);
+                }
+            }
+
+            if (lastBeaconDropTime < beaconCooldown)
+            {
+                lastBeaconDropTime += Time.deltaTime;
+            }
+            else
+            {
+                if (CheckIfGrounded() && CheckIfPrimaryButtonPressed())
+                {
+                    lastBeaconDropTime = 0.0f;
+                    TryDropAlienBeacon();
+                }
+            }
+        }
+
+        private void TryDropAlienBeacon()
+        {
+            if (activeBeacon != null)
+            {
+                Runner.Despawn(activeBeacon);
+                activeBeacon = null;
+            }
+
+            var spawnedObject = Runner.Spawn(
+                beaconPrefab,
+                new Vector3(transform.position.x, 0.5f, transform.position.z),
+                Quaternion.identity,
+                inputAuthority: Object.InputAuthority
+                );
+
+            activeBeacon = spawnedObject;
+
+            AlienBeacon beaconObject = activeBeacon.GetComponent<AlienBeacon>();
+
+            if (beaconObject != null)
+            {
+                beaconObject.owner = this;
+            }
+        }
+
+        public void NotifyBeaconDestroyed()
+        {
+            activeBeacon = null;
+
+            Debug.Log("Your beacon was destroyed!");
+
+            SendHapticImpulse(leftHandDevice, 0.6f, 0.15f);
+            SendHapticImpulse(rightHandDevice, 0.6f, 0.15f);
+        }
+
+        private bool CheckIfPrimaryButtonPressed()
+        {
+            bool primaryButtonPressed = false;
+
+            if (rightHandDevice.device.IsPressed(InputHelpers.Button.PrimaryButton, out primaryButtonPressed, 0.1f))
+            {
+                return primaryButtonPressed;
+            }
+
+            return primaryButtonPressed;
+        }
+
+        private bool CheckIfSecondaryButtonPressed()
+        {
+            bool secondaryButtonPressed = false;
+
+            if (rightHandDevice.device.IsPressed(InputHelpers.Button.SecondaryButton, out secondaryButtonPressed, 0.1f))
+            {
+                return secondaryButtonPressed;
+            }
+
+            return secondaryButtonPressed;
+        }
+
+        private bool CheckIfGrounded()
+        {
+            return Physics.Raycast(bodyCollider.gameObject.transform.position, -Vector3.up, 0.5f);
+        }
+
+        private bool CheckIfPlayerHoldingTriggers()
+        {
+            if (leftHandDevice.device.IsPressed(InputHelpers.Button.Trigger, out leftTriggerHeld, 0.1f) && rightHandDevice.device.IsPressed(InputHelpers.Button.Trigger, out rightTriggerHeld, 0.1f))
+            {
+                return leftTriggerHeld && rightTriggerHeld;
+            }
+
+            return false;
         }
 
         private bool IterativeCollisionSphereCast(Vector3 startPosition, float sphereRadius, Vector3 movementVector, float precision, out Vector3 endPosition, bool singleHand)
@@ -374,12 +730,24 @@
 
         private void StoreVelocities()
         {
-            velocityIndex = (velocityIndex + 1) % velocityHistorySize;
-            Vector3 oldestVelocity = velocityHistory[velocityIndex];
-            currentVelocity = (transform.position - lastPosition) / Time.deltaTime;
-            denormalizedVelocityAverage += (currentVelocity - oldestVelocity) / (float)velocityHistorySize;
-            velocityHistory[velocityIndex] = currentVelocity;
-            lastPosition = transform.position;
+            if (velocityHistorySize != 0)
+            {
+                velocityIndex = (velocityIndex + 1) % velocityHistorySize;
+
+                Vector3 oldestVelocity = velocityHistory[velocityIndex];
+                currentVelocity = (transform.position - lastPosition) / Time.deltaTime;
+                denormalizedVelocityAverage += (currentVelocity - oldestVelocity) / (float)velocityHistorySize;
+                velocityHistory[velocityIndex] = currentVelocity;
+                lastPosition = transform.position;
+            }
+        }
+
+        private void SendHapticImpulse(XRControllerInputDevice controller, float amplitude, float duration)
+        {
+            if (controller != null && controller.device.isValid)
+            {
+                controller.device.SendHapticImpulse(0u, amplitude, duration);
+            }
         }
     }
 }

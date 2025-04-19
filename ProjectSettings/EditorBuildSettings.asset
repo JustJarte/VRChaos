@@ -6,11 +6,21 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/DefaultScenes/SampleNetworkBasedGrabbingScene.unity
-    guid: 3651a76d14cb8454c96a9486ec26f729
-  - enabled: 0
-    path: Assets/DefaultScenes/SampleHardwareBasedGrabbingScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/Scenes/VRChaos/StartingLobby.unity
+    guid: 7dd64479980d01f4591e5cc2c49c241f
+  - enabled: 1
+    path: Assets/Scenes/VRChaos/DecryptidMode_AlphaMap.unity
+    guid: ae01acfc9a843c847a3c5ba65a5ccf5d
+  - enabled: 1
+    path: Assets/Scenes/VRChaos/BattleMode_AlphaMap.unity
+    guid: 48c4498b7f1e6a04a8be7d14f59c7b5f
+  - enabled: 1
+    path: Assets/Scenes/VRChaos/FreePlayMode_AlphaMap.unity
+    guid: 702b89c0eb630ed44a0a5aabd5b0d8b1
+  - enabled: 1
+    path: Assets/Scenes/VRChaos/TagMode_AlphaMap.unity
+    guid: 4359c86bf84daad4882b9974bf676570
   m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 76dac3af5920ca94092e283106bf6a01, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9bd7077edc5b871469aa672a34c4ef3a, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b275ea07267359d46ac951b75a3557f2, type: 2}

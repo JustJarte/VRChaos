@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Fusion.Addons.ConnectionManagerAddon
-{
+{ 
     /**
      * 
      * Handles:
@@ -40,6 +40,7 @@ namespace Fusion.Addons.ConnectionManagerAddon
         public bool connectOnStart = true;
         [Tooltip("Set it to 0 to use the DefaultPlayers value, from the Global NetworkProjectConfig (simulation section)")]
         public int playerCount = 0;
+        [SerializeField] private GameSettingsSO gameSettings;
 
         [Header("Room selection criteria")]
         public ConnectionCriterias connectionCriterias = ConnectionCriterias.RoomName;
@@ -53,6 +54,7 @@ namespace Fusion.Addons.ConnectionManagerAddon
         public INetworkSceneManager sceneManager;
 
         [Header("Local user spawner")]
+        public List<NetworkObject> userPrefabs = new List<NetworkObject>();
         public NetworkObject userPrefab;
 
 #region IUserSpawner
@@ -82,6 +84,11 @@ namespace Fusion.Addons.ConnectionManagerAddon
             // Create the Fusion runner and let it know that we will be providing user input
             if (runner == null) runner = gameObject.AddComponent<NetworkRunner>();
             runner.ProvideInput = true;
+
+            //Keep an eye on this to make sure it works correctly or needs to be moved
+            var cryptidCharIndex = (int)gameSettings.selectedCryptidCharacter;
+            userPrefab = userPrefabs[cryptidCharIndex];
+            UserPrefab = userPrefab;
         }
 
         private async void Start()
