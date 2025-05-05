@@ -5,6 +5,7 @@ using Fusion;
 public class AlienBeacon : NetworkBehaviour
 {
     [HideInInspector] public Player owner;
+    [HideInInspector] public AlienSkills skillTracker;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -18,9 +19,9 @@ public class AlienBeacon : NetworkBehaviour
                 }
                 else
                 {
-                    if (owner != null)
+                    if (skillTracker != null)
                     {
-                        owner.NotifyBeaconDestroyed();
+                        skillTracker.NotifyBeaconDestroyed();
                     }
 
                     Runner.Despawn(Object);

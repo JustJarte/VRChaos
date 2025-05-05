@@ -9,42 +9,25 @@ public class LobbyManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameSettingsSO gameSettings;
-    [SerializeField] private CanvasGroup fadeCanvas;
-    [SerializeField] private NetworkRunner runnerPrefab;
-
-    [Header("Game References")]
-    [SerializeField] private List<GameObject> characterPrefabs;
-    [SerializeField] private List<string> modeSceneNames;
+    [SerializeField] private GameObject errorMessage;
+    [SerializeField] private GameObject player;
 
     private GameObject currentCharacterPreviewed;
-    private NetworkRunner instancedNetworkRunner;
+    private bool selectedCharacter = false;
 
     private void Awake()
     {
-        var networkRunner = FindObjectOfType<NetworkRunner>();
-
-        if (networkRunner != null)
+        if (gameSettings.selectedCryptidCharacter != CryptidCharacterType.Default)
         {
-            instancedNetworkRunner = networkRunner;
+            selectedCharacter = true;
         }
-        else
-        {
-            instancedNetworkRunner = Instantiate(runnerPrefab);
-            DontDestroyOnLoad(instancedNetworkRunner.gameObject); // Persist through scene load
-
-            instancedNetworkRunner.ProvideInput = true;
-        }
-    }
-
-    private void Start()
-    {
-        //UpdateCryptidCharacterPreview(gameSettings.selectedCryptidCharacter);
     }
 
     public void SelectCryptidCharacter(int index)
     {
         gameSettings.selectedCryptidCharacter = (CryptidCharacterType)index;
-        //UpdateCryptidCharacterPreview(gameSettings.selectedCryptidCharacter);
+
+        selectedCharacter = true;
     }
 
     public void DebugLog(string displayText)
@@ -54,15 +37,30 @@ public class LobbyManager : MonoBehaviour
 
     public void SelectGameMode(int index)
     {
-        gameSettings.selectedGamePlayMode = (GamePlayMode)index;
+        if (errorMessage.activeSelf)
+        {
+            errorMessage.SetActive(false);
+        }
 
-        //Do some fancy fade here before loading the game mode scene
-        StartGame();
+        gameSettings.selectedGamePlayMode = (GamePlayMode)index;
     }
 
     public void StartGame()
     {
-        StartCoroutine(StartGameSequence());
+        if (gameSettings.selectedGamePlayMode != GamePlayMode.NoSelection && selectedCharacter)
+        {
+            //Do some fancy fade here before loading the game mode scene
+            StartCoroutine(StartGameSequence());
+        }
+        else if (gameSettings.selectedGamePlayMode == GamePlayMode.NoSelection && selectedCharacter)
+        {
+            Debug.Log("Mode has not been selected, please select a mode to start a game!");
+            errorMessage.SetActive(true);
+        }
+        else if (!selectedCharacter)
+        {
+            Debug.Log("Please select a character; cannot start a game until a character is selected!");
+        }
     }
 
     //Maybe retool for skins here
@@ -73,34 +71,10 @@ public class LobbyManager : MonoBehaviour
 
     private IEnumerator StartGameSequence()
     {
-        yield return FadeToBlack();
+        ScreenFader.Instance?.FadeToBlack();
 
-        var sceneToLoad = gameSettings.GetSceneNameForSelectedMode();
+        yield return new WaitForSeconds(2.0f);
 
-        var sceneInfo = SceneRef.FromIndex(UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToLoad).buildIndex);
-
-        int allowedPlayerCount = gameSettings.GetModePlayerLimit();
-
-        var startGameArgs = new StartGameArgs
-        {
-            GameMode = GameMode.AutoHostOrClient,
-            Scene = sceneInfo,
-            SessionName = gameSettings.selectedGamePlayMode.ToString(),
-            PlayerCount = allowedPlayerCount,
-            SceneManager = instancedNetworkRunner.GetComponent<NetworkSceneManagerDefault>()
-        }; 
-
-        yield return instancedNetworkRunner.StartGame(startGameArgs);
-    }
-
-    private IEnumerator FadeToBlack()
-    {
-        fadeCanvas.gameObject.SetActive(true);
-
-        while (fadeCanvas.alpha < 1.0f)
-        {
-            fadeCanvas.alpha += Time.deltaTime * 1.5f;
-            yield return null;
-        }
+        SceneManager.LoadScene((int)gameSettings.selectedGamePlayMode + 1);
     }
 }

@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02911238071eca34a9904c8013febb95, type: 3}
+  m_Name: SkinsContainer
+  m_EditorClassIdentifier: 
+  playerSkins:
+  - skinName: DefaultBigfootSkin
+    cryptidSkinType: 0
+    skinColors:
+    - {fileID: 2100000, guid: ae00852022ac84b43bffa11ebf6db63b, type: 2}
+    - {fileID: 2100000, guid: 122d78b73d719c345929d72acc176e6c, type: 2}
+    - {fileID: 2100000, guid: 768242fc7be3b684b90ead046a9b40fe, type: 2}
+    - {fileID: 2100000, guid: 6c1b0e6869e0a7545ab5e6a299fad83b, type: 2}
+  - skinName: RabidBigfootSkin
+    cryptidSkinType: 0
+    skinColors:
+    - {fileID: 2100000, guid: 6c57669aaef291e43b1d425d8867e8e5, type: 2}
+    - {fileID: 2100000, guid: c9046109ad900b144a57ad501c76546b, type: 2}
+    - {fileID: 2100000, guid: aa8a5226db85ee243a82e31c16e0ee2c, type: 2}
+    - {fileID: 2100000, guid: 261fdecd611a64d4ba00b74b5cad0328, type: 2}
+  - skinName: EliminatedBigfootSkin
+    cryptidSkinType: 0
+    skinColors:
+    - {fileID: 2100000, guid: 4f2097693edcd214492046dae7a093fd, type: 2}
+    - {fileID: 2100000, guid: f520883b42fabb74b98d82eaeb0cbdea, type: 2}
+    - {fileID: 2100000, guid: 454c43a0a4c01b3489942c4d8a85d8dd, type: 2}
+    - {fileID: 2100000, guid: d9535681d5a8a934b8fdcdde4f81773c, type: 2}
+  - skinName: Alt1BigfootSkin
+    cryptidSkinType: 0
+    skinColors:
+    - {fileID: 2100000, guid: e69b48fe47038b94782f0989dfc91680, type: 2}
+    - {fileID: 2100000, guid: e09d9a1a3e125554685ed9180bee1102, type: 2}
+    - {fileID: 2100000, guid: 90fe6a19c7b605a418fc0fc6099b1914, type: 2}
+    - {fileID: 2100000, guid: 658aad04230d34a43b9c8b6f5f729d0e, type: 2}
+  - skinName: DefaultAlienSkin
+    cryptidSkinType: 2
+    skinColors:
+    - {fileID: 2100000, guid: 88a442c69e71a9d4cade0dd92609b132, type: 2}
+    - {fileID: 2100000, guid: 46cb11c512ca6ba46b7ff13f414aa605, type: 2}
+  - skinName: RabidAlienSkin
+    cryptidSkinType: 2
+    skinColors:
+    - {fileID: 2100000, guid: c94010194e9504641bf50cabb9a6d6e5, type: 2}
+    - {fileID: 2100000, guid: f09e2fffc52a8724a8b590a95d079c9f, type: 2}
+  - skinName: EliminatedAlienSkin
+    cryptidSkinType: 2
+    skinColors:
+    - {fileID: 2100000, guid: ad3fb660f4ab6544a8d42df5a706abec, type: 2}
+    - {fileID: 2100000, guid: d94fb1d0539232f4e8da850da67f317f, type: 2}
+  - skinName: DefaultMothmanSkin
+    cryptidSkinType: 1
+    skinColors:
+    - {fileID: 2100000, guid: fe7b5828f645f6643a2a6d48469601dc, type: 2}
+    - {fileID: 2100000, guid: 5e93140345d5323488fe9ffcd0853f7c, type: 2}
+  - skinName: RabidMothmanSkin
+    cryptidSkinType: 1
+    skinColors:
+    - {fileID: 2100000, guid: 0aaf7b8e836602347a8779b204755668, type: 2}
+    - {fileID: 2100000, guid: ce86a803874326641bc5fa38c5a66856, type: 2}
+  - skinName: EliminatedMothmanSkin
+    cryptidSkinType: 1
+    skinColors:
+    - {fileID: 2100000, guid: 5cd419ae404c7fc45acdec2f3cfefd6e, type: 2}
+    - {fileID: 2100000, guid: 597223b8179f67f4a8763d54ff9ab33c, type: 2}
+  - skinName: Alt1MothmanSkin
+    cryptidSkinType: 1
+    skinColors:
+    - {fileID: 2100000, guid: dc0bad4b7d936914da640963391bd681, type: 2}
+    - {fileID: 2100000, guid: bccdecaaeb642444893f0f61d350c1f7, type: 2}
+  - skinName: DefaultFrogmanSkin
+    cryptidSkinType: 3
+    skinColors:
+    - {fileID: 2100000, guid: e3093fb1d1db80d438d4b1bf9594a475, type: 2}
+    - {fileID: 2100000, guid: 248ea09f497f8b94baff00f344e79507, type: 2}
+    - {fileID: 2100000, guid: 5c3f6b3314338d948b04b8e3ef0b5f0f, type: 2}
+    - {fileID: 2100000, guid: f48633d390a3b1b44a4b8557b4a954ff, type: 2}
+    - {fileID: 2100000, guid: 6d840cc627a3baf4cbb344f21220d6c2, type: 2}
+  - skinName: RabidFrogmanSkin
+    cryptidSkinType: 3
+    skinColors:
+    - {fileID: 2100000, guid: 8807e16c310d6cc47ab7e7582b563c26, type: 2}
+    - {fileID: 2100000, guid: f4e6fcc6fde40e04d8084a1bdf907c20, type: 2}
+    - {fileID: 2100000, guid: 3d7657b47ce700f489f0021f90b9be70, type: 2}
+    - {fileID: 2100000, guid: 7d3083f2b54e55e478a90e7b4db799ed, type: 2}
+    - {fileID: 2100000, guid: fa2f00bfa7f728e41bf9812301d7fb6f, type: 2}
+  - skinName: EliminatedFrogmanSkin
+    cryptidSkinType: 3
+    skinColors:
+    - {fileID: 2100000, guid: 6c7117d3098208e4da9b1742889d7ea8, type: 2}
+    - {fileID: 2100000, guid: 4eb181d5597626846acaf198919f2e5c, type: 2}
+    - {fileID: 2100000, guid: a88933e0855713e48874d9986ba82711, type: 2}
+    - {fileID: 2100000, guid: e1d33c88817290844a75d1489ca38ae8, type: 2}
+    - {fileID: 2100000, guid: 1e46a5081d5692d408a21fe3092ff881, type: 2}

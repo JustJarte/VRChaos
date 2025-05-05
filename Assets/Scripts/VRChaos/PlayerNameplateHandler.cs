@@ -8,12 +8,16 @@ public class PlayerNameplateHandler : NetworkBehaviour
     [SerializeField] private GameObject teamColourIndicator; // optional: colored ring/icon? ask ChatGPT
     [SerializeField] private Transform lookAtCameraTarget; //optional: billboard to main camera
 
+    private string originalDisplayName;
+
     public override void Spawned()
     {
         if (nameText)
         {
             string displayName = Object.HasInputAuthority ? "You" : $"Player {Object.InputAuthority.PlayerId}";
             nameText.text = displayName;
+
+            originalDisplayName = displayName;
         }
 
         var cryptidHandler = GetComponent<CryptidTypeHandler>();
@@ -22,6 +26,17 @@ public class PlayerNameplateHandler : NetworkBehaviour
         {
             teamColourIndicator.GetComponent<Renderer>().material.color = GetColourForCryptid(cryptidHandler.CryptidCharacterType);
         }
+    }
+
+    public void UpdatePlayerPrefix(string appendText)
+    {
+        string currentName = nameText.text;
+        nameText.text = appendText + currentName;
+    }
+
+    public void UpdateNameDisplayColour(Color c)
+    {
+        nameText.color = c;
     }
 
     private void Update()

@@ -688,9 +688,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28efdbde3442d8843b80556ef0afcd13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  headTransform: {fileID: 0}
-  leftHand: {fileID: 0}
-  rightHand: {fileID: 0}
+  playerCamera: {fileID: 3873281110079670590}
+  audioListener: {fileID: 3873281110079670577}
 --- !u!114 &4756243745597863208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -752,6 +751,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3873281108554303480}
   - component: {fileID: 3873281108554303481}
+  - component: {fileID: 7236419018352321865}
   - component: {fileID: 3873281108554303366}
   - component: {fileID: 3873281108554303487}
   m_Layer: 8
@@ -796,39 +796,60 @@ MonoBehaviour:
   bodyCollider: {fileID: 3873281108982308306}
   leftHandFollower: {fileID: 3873281109812661550}
   rightHandFollower: {fileID: 3873281110154066962}
-  rightHandTransform: {fileID: 3873281110280747625}
   leftHandTransform: {fileID: 3873281108728117659}
+  rightHandTransform: {fileID: 3873281110280747625}
   velocityHistorySize: 8
   maxArmLength: 1.5
   unStickDistance: 1
-  velocityLimit: 0.4
-  maxJumpSpeed: 6.5
-  jumpMultiplier: 2
   minimumRaycastDistance: 0.05
   defaultSlideFactor: 0.03
   defaultPrecision: 0.995
-  rightHandOffset: {x: 0, y: 0, z: 0}
-  leftHandOffset: {x: 0, y: 0, z: 0}
+  velocityLimit: 0.4
+  maxJumpSpeed: 6.5
+  jumpMultiplier: 2
+  tagRange: 1.5
+  stunDuration: 2
+  invulnerabilityDuration: 3
+  slowDuration: 1.5
+  slowMultiplier: 0.6
   locomotionEnabledLayers:
     serializedVersion: 2
     m_Bits: 1
+  rightHandOffset: {x: 0, y: 0, z: 0}
+  leftHandOffset: {x: 0, y: 0, z: 0}
+  previousLeftHandLocalPos: {x: 0, y: 0, z: 0}
+  previousRightHandLocalPos: {x: 0, y: 0, z: 0}
   wasLeftHandTouching: 0
   wasRightHandTouching: 0
   disableMovement: 0
-  affectablePlayerLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  leftHandDevice: {fileID: 3903714965156756198}
-  rightHandDevice: {fileID: 6992186514612436006}
   playerHands:
   - {fileID: 6102610852799717013}
   - {fileID: 6102610852780588112}
+  leftHandDevice: {fileID: 3903714965156756198}
+  rightHandDevice: {fileID: 6992186514612436006}
+  namePlateHandler: {fileID: 9148889751657987100}
+  gameSettings: {fileID: 11400000, guid: 9cd55ef6295e0ab4bbaeb1c179dba299, type: 2}
+  optionSettings: {fileID: 11400000, guid: 7e30b94126038074a9e9ffee19a23d0a, type: 2}
   _IsAfflicted: 0
-  beaconPrefab:
-    RawGuidValue: bc9a936424afe1846a13d945fa2aba1a
-  wandTipPoint: {fileID: 0}
-  magicProjectilePrefab:
-    RawGuidValue: bb22149855b657f48982c4a874f3cdf4
+--- !u!114 &7236419018352321865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3873281108554303483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac51702bdc7d444782b48b7cf780b80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWingFlapsRemaining: 5
+  maxWingFlaps: 5
+  flapCooldown: 0.25
+  lastFlapTime: 0
+  glideFallSpeed: -2
+  player: {fileID: 3873281108554303481}
+  playerRigidbody: {fileID: 3873281108554303366}
 --- !u!54 &3873281108554303366
 Rigidbody:
   m_ObjectHideFlags: 0

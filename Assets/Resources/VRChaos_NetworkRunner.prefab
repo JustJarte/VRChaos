@@ -78,3 +78,4 @@ MonoBehaviour:
   - {fileID: 988587593291206292, guid: 53417a9f44ba42d468dfb1af65c9baa6, type: 3}
   - {fileID: 4199855643797665633, guid: 6b477d493b64adc4b8589f42428fe304, type: 3}
   gameSettings: {fileID: 11400000, guid: 9cd55ef6295e0ab4bbaeb1c179dba299, type: 2}
+  spawnLocationCollection: {fileID: 11400000, guid: a218a99efb750174e857624b43b8f134, type: 2}

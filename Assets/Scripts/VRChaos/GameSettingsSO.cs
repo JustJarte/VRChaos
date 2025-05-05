@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,16 +8,51 @@ public enum GamePlayMode
     Decryptid,
     Battle,
     FreePlay,
-    Tag
+    Tag,
+    NoSelection
 }
 
 [CreateAssetMenu(menuName = "VRChaos/Game Settings")]
 public class GameSettingsSO : ScriptableObject
 {
     public CryptidCharacterType selectedCryptidCharacter = CryptidCharacterType.Default;
-    public GamePlayMode selectedGamePlayMode = GamePlayMode.Decryptid;
+    public GamePlayMode selectedGamePlayMode = GamePlayMode.NoSelection;
+
+    public float smoothTurningSpeed = 90.0f;
+    public float snapTurnAngle = 45.0f;
+    public float snapTurnCooldown = 0.3f;
 
     private const string CRYPTID_PREF_KEY = "LastCryptid";
+
+    private StartGameArgs currentStartArgs;
+    private GameMode currentGameMode;
+    private NetworkSceneInfo currentSceneInfo;
+    private string currentSessionName;
+    private Dictionary<string, SessionProperty> currentSessionProperties;
+    private NetworkSceneManagerDefault currentManager;
+
+    public void ResetGameSettings()
+    {
+        if (PlayerPrefs.HasKey(CRYPTID_PREF_KEY))
+        {
+            selectedCryptidCharacter = (CryptidCharacterType)PlayerPrefs.GetInt(CRYPTID_PREF_KEY);
+        }
+        else
+        {
+            selectedCryptidCharacter = CryptidCharacterType.Default;
+        }
+
+        selectedGamePlayMode = GamePlayMode.NoSelection;
+
+        currentSessionName = "";
+
+        if (currentSessionProperties != null)
+        {
+            currentSessionProperties.Clear();
+        }
+
+        currentManager = null;
+    }
 
     public void SaveSelectedCryptid()
     {
@@ -24,12 +60,28 @@ public class GameSettingsSO : ScriptableObject
         PlayerPrefs.Save();
     }
 
-    public void LoadLastSelectedCryptid()
+    public void CreateStartGameArgs(GameMode currentGameConnectionMode, NetworkSceneInfo sceneInfo, Dictionary<string, SessionProperty> sessionProperties, NetworkSceneManagerDefault manager)
     {
-        if (PlayerPrefs.HasKey(CRYPTID_PREF_KEY))
+        currentSceneInfo = sceneInfo;
+        currentGameMode = currentGameConnectionMode;
+        currentSessionName = selectedGamePlayMode.ToString();
+        currentSessionProperties = sessionProperties;
+        currentManager = manager;
+
+        currentStartArgs = new StartGameArgs
         {
-            selectedCryptidCharacter = (CryptidCharacterType)PlayerPrefs.GetInt(CRYPTID_PREF_KEY);
-        }
+            GameMode = currentGameMode,
+            Scene = currentSceneInfo,
+            SessionName = currentSessionName,
+            PlayerCount = GetModePlayerLimit(),
+            SessionProperties = currentSessionProperties,
+            SceneManager = currentManager         
+        };
+    }
+
+    public StartGameArgs GetStartArgs()
+    {
+        return currentStartArgs;
     }
 
     public string GetSceneNameForSelectedMode()

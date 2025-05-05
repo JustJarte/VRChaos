@@ -1313,6 +1313,32 @@ MonoBehaviour:
   m_Script: {fileID: -1199893898, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &833719067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833719063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3b2dfec39f015045b1dbe3b2d68d390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameMode: 6
+  roomName: SampleFusionVRSharedHardwareBasedGrabbing
+  connectOnStart: 1
+  playerCount: 10
+  gameSettings: {fileID: 11400000, guid: 9cd55ef6295e0ab4bbaeb1c179dba299, type: 2}
+  connectionCriterias: 1
+  additionalSessionProperties: []
+  runner: {fileID: 833719066}
+  userPrefabs: []
+  userPrefab: {fileID: 2549000073306557744, guid: e263782ae517b5e46a1d6228d8ee88b7, type: 3}
+  onWillConnect:
+    m_PersistentCalls:
+      m_Calls: []
+  actualSessionProperties: []
 --- !u!1 &866083446
 GameObject:
   m_ObjectHideFlags: 0

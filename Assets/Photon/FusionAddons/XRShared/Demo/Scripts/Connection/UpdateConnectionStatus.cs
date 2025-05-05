@@ -46,7 +46,7 @@ public class UpdateConnectionStatus : MonoBehaviour, INetworkRunnerCallbacks
 
     protected virtual void DebugLog(string debug, bool permanentError = false)
     {
-        sessionStatus.text = debug;
+        //sessionStatus.text = debug;
         if (permanentError)
         {
             Debug.LogError(debug);

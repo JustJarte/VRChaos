@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43406c86a6abf534ca5899b5dfff7fab, type: 3}
+  m_Name: PositionsForHeldObjects
+  m_EditorClassIdentifier: 
+  objectToHands:
+  - objectName: FrogmanWand
+    handAndFingerPositionings:
+    - boneName: Hand_R
+      path: Hand_R
+      position: {x: 0, y: 0.00753, z: -0}
+      rotation: {x: 0.7000794, y: 0.60239536, z: -0.23310466, w: -0.30441916}
+      scale: {x: 1, y: 1, z: 1}
+    - boneName: Index_base.R
+      path: Hand_R/current.name
+      position: {x: -0.00097476464, y: 0.000087939785, z: -0.00014382822}
+      rotation: {x: -0.28178522, y: -0.46711323, z: -0.6019495, w: 0.58314586}
+      scale: {x: 1, y: 1, z: 1}
+    - boneName: Index_middle.R
+      path: Hand_R/current.name/current.name
+      position: {x: 1.0244548e-10, y: 0.0017007814, z: 9.313225e-11}
+      rotation: {x: -0.35425118, y: -0.6957084, z: 0.36731264, w: 0.5055467}
+      scale: {x: 1, y: 0.99999994, z: 0.9999999}
+    - boneName: Index_tip.R
+      path: Hand_R/current.name/current.name/current.name
+      position: {x: -6.3097105e-10, y: 0.000833783, z: 1.3038516e-10}
+      rotation: {x: 0.000000029802315, y: -0.00000006332992, z: 0.73364455, w: 0.6795335}
+      scale: {x: 0.99999994, y: 1, z: 1}
+    - boneName: Pinky_base.R
+      path: Hand_R/current.name
+      position: {x: -0.00097476464, y: 0.000087939785, z: -0.00014382822}
+      rotation: {x: -0.13104758, y: -0.18122514, z: 0.6781216, w: -0.7000964}
+      scale: {x: 1, y: 1, z: 1}
+    - boneName: Pinky_middle.R
+      path: Hand_R/current.name/current.name
+      position: {x: 0.0000000022555469, y: 0.0016037716, z: -7.1304385e-10}
+      rotation: {x: -0.108014286, y: -0.5939064, z: -0.3827083, w: 0.6993873}
+      scale: {x: 0.9999996, y: 1, z: 0.99999976}
+    - boneName: Pinky_tip.R
+      path: Hand_R/current.name/current.name/current.name
+      position: {x: -5.2154064e-10, y: 0.0008422755, z: 1.862645e-10}
+      rotation: {x: -0.8536689, y: -0.15445781, z: -0.08855624, w: 0.4894384}
+      scale: {x: 0.99999994, y: 0.99999994, z: 0.99999994}
+    - boneName: Thumb_base.R
+      path: Hand_R/current.name
+      position: {x: -0.00097476464, y: 0.000087939785, z: -0.00014382822}
+      rotation: {x: -0.5462684, y: -0.46326217, z: -0.62868106, w: 0.30288473}
+      scale: {x: 1, y: 1, z: 1}
+    - boneName: Thumb_tip.R
+      path: Hand_R/current.name/current.name
+      position: {x: -7.7765433e-10, y: 0.0008529119, z: -3.457535e-10}
+      rotation: {x: 0.058896527, y: 0.2700035, z: -0.15418617, w: 0.94860744}
+      scale: {x: 0.99999994, y: 0.99999994, z: 1}

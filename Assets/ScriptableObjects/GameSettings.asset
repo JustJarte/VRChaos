@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1a345c7d193ab14582a7a991ad23b75, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  selectedCryptidCharacter: 0
-  selectedGameMode: Decryptid
+  selectedCryptidCharacter: 4
+  selectedGamePlayMode: 4
+  smoothTurningSpeed: 90
+  snapTurnAngle: 45
+  snapTurnCooldown: 0.3
