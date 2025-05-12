@@ -428,12 +428,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 430285557273465589}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28efdbde3442d8843b80556ef0afcd13, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b4913b6ffcb9304e9bf147c85f960d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  headTransform: {fileID: 0}
-  leftHand: {fileID: 0}
-  rightHand: {fileID: 0}
+  headCollider: {fileID: 0}
+  bodyCollider: {fileID: 0}
+  leftHandFollower: {fileID: 0}
+  rightHandFollower: {fileID: 0}
+  rightHandTransform: {fileID: 0}
+  leftHandTransform: {fileID: 0}
+  velocityHistorySize: 0
+  maxArmLength: 1.5
+  unStickDistance: 1
+  velocityLimit: 0
+  maxJumpSpeed: 0
+  jumpMultiplier: 0
+  minimumRaycastDistance: 0.05
+  defaultSlideFactor: 0.03
+  defaultPrecision: 0.995
+  rightHandOffset: {x: 0, y: 0, z: 0}
+  leftHandOffset: {x: 0, y: 0, z: 0}
+  locomotionEnabledLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  wasLeftHandTouching: 0
+  wasRightHandTouching: 0
+  disableMovement: 0
 --- !u!1 &430285557519011101
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,29 +502,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18dcb4be0dacd14f9bb6fd32d26e078, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headCamera: {fileID: 0}
+  trackedPoseDriver: {fileID: 0}
   headCollider: {fileID: 430285556866155483}
   bodyCollider: {fileID: 430285557946750772}
   leftHandFollower: {fileID: 430285556596328392}
   rightHandFollower: {fileID: 430285556925871860}
-  rightHandTransform: {fileID: 430285557067231375}
   leftHandTransform: {fileID: 430285557680239485}
+  rightHandTransform: {fileID: 430285557067231375}
+  xrOrigin: {fileID: 0}
   velocityHistorySize: 8
   maxArmLength: 1.5
   unStickDistance: 1
-  velocityLimit: 0.4
-  maxJumpSpeed: 6.5
-  jumpMultiplier: 1.1
   minimumRaycastDistance: 0.05
   defaultSlideFactor: 0.03
   defaultPrecision: 0.995
-  rightHandOffset: {x: 0, y: 0, z: 0}
-  leftHandOffset: {x: 0, y: 0, z: 0}
+  velocityLimit: 0.4
+  maxJumpSpeed: 6.5
+  jumpMultiplier: 1.1
+  tagRange: 1.5
+  stunDuration: 2
+  invulnerabilityDuration: 3
+  slowDuration: 1.5
+  slowMultiplier: 0.6
   locomotionEnabledLayers:
     serializedVersion: 2
     m_Bits: 1
+  debugMultiplayerTesting: 0
+  rightHandOffset: {x: 0, y: 0, z: 0}
+  leftHandOffset: {x: 0, y: 0, z: 0}
+  previousLeftHandLocalPos: {x: 0, y: 0, z: 0}
+  previousRightHandLocalPos: {x: 0, y: 0, z: 0}
   wasLeftHandTouching: 0
   wasRightHandTouching: 0
   disableMovement: 0
+  statusKeys: []
+  playerHands: []
+  holdObjects: []
+  leftHandHoldSpace: {fileID: 0}
+  rightHandHoldSpace: {fileID: 0}
+  leftHandDevice: {fileID: 0}
+  rightHandDevice: {fileID: 0}
+  namePlateHandler: {fileID: 0}
+  gameSettings: {fileID: 0}
+  optionSettings: {fileID: 0}
+  playerSkins: {fileID: 0}
+  playerAudioListener: {fileID: 0}
+  playerSkinRenderer: {fileID: 0}
+  _IsInfected: 0
+  _IsEliminated: 0
+  _IsInvulnerable: 0
+  _IsStunned: 0
+  _HasBuff: 0
+  _IsSlowed: 0
+  _IsAfflicted: 0
 --- !u!54 &430285557519011168
 Rigidbody:
   m_ObjectHideFlags: 0

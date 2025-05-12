@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Simply animates a draw string for the crossbow weapon. Purely aesthetic, it merely followed the center point, which is the Pull Piece, which moves along a track, but can become more defined with more positions and such as preferred.
 public class TranqDartGunBowstring : MonoBehaviour
 {
     [SerializeField] private Transform leftBowgunAnchor;
@@ -18,6 +19,7 @@ public class TranqDartGunBowstring : MonoBehaviour
         positions = new Vector3[curveResolution];
     }
 
+    // Keeps track of the anchors, and animates the string being pulled back as the Pull Piece moves, and then released.
     private void LateUpdate()
     {
         Vector3 start = transform.InverseTransformPoint(leftBowgunAnchor.position);

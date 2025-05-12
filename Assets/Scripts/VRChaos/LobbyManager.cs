@@ -1,10 +1,8 @@
-using Fusion;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
 
+// Basic manager class for the starting lobby; sets the selected character and selected mode when chosen and saves them to the GameSettingsSO. Methods are made public so that they can be called directly from a UI Button so that they are performed when clicked.
 public class LobbyManager : MonoBehaviour
 {
     [Header("References")]
@@ -15,6 +13,7 @@ public class LobbyManager : MonoBehaviour
     private GameObject currentCharacterPreviewed;
     private bool selectedCharacter = false;
 
+    // If a preferred character is saved in PlayerPrefs, this is made true on Awake so that the player can just jump straight into a game mode without having to reselect a character just to put this flag to TRUE.
     private void Awake()
     {
         if (gameSettings.selectedCryptidCharacter != CryptidCharacterType.Default)
@@ -23,6 +22,7 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    // Method to select a character, called from the selectable Cryptid pictures in the lobby. When they are clicked, saves that character.
     public void SelectCryptidCharacter(int index)
     {
         gameSettings.selectedCryptidCharacter = (CryptidCharacterType)index;
@@ -30,11 +30,7 @@ public class LobbyManager : MonoBehaviour
         selectedCharacter = true;
     }
 
-    public void DebugLog(string displayText)
-    {
-        Debug.Log("I'm showing that clicking on buttons is working: " + displayText);
-    }
-
+    // Method to select a game mode, called from the selectable buttons on the dry erase board in the lobby. When they are clicked, saves that selected game mode to jump into when the Start Button is pressed.
     public void SelectGameMode(int index)
     {
         if (errorMessage.activeSelf)
@@ -45,11 +41,11 @@ public class LobbyManager : MonoBehaviour
         gameSettings.selectedGamePlayMode = (GamePlayMode)index;
     }
 
+    // Method to start a selected game mode via Coroutine, called from the selectable Start Button on the dry erase board in the lobby. Loads the scene of the game mode the player selected.
     public void StartGame()
     {
         if (gameSettings.selectedGamePlayMode != GamePlayMode.NoSelection && selectedCharacter)
         {
-            //Do some fancy fade here before loading the game mode scene
             StartCoroutine(StartGameSequence());
         }
         else if (gameSettings.selectedGamePlayMode == GamePlayMode.NoSelection && selectedCharacter)
@@ -63,15 +59,13 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    //Maybe retool for skins here
-    private void UpdateCryptidCharacterPreview(CryptidCharacterType selectedCharacter)
-    {
+    //Maybe retool for choosing alt-skins here
+    private void UpdateCryptidCharacterPreview(CryptidCharacterType selectedCharacter) { }
 
-    }
-
+    // Fades the player's view and loads into the new scene.
     private IEnumerator StartGameSequence()
     {
-        ScreenFader.Instance?.FadeToBlack();
+        MultipurposeHUD.Instance?.FadeToBlack();
 
         yield return new WaitForSeconds(2.0f);
 

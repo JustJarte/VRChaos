@@ -162,9 +162,9 @@
             {
                 EnableOrDisableLocalComponents(true);
                 
-                if (ScreenFader.Instance != null)
+                if (MultipurposeHUD.Instance != null)
                 {
-                    ScreenFader.Instance?.InitializeForLocalPlayer(headCamera);
+                    MultipurposeHUD.Instance?.InitializeForLocalPlayer(headCamera);
                 }
             }
             else
@@ -238,18 +238,18 @@
 
         private void EnableOrDisableLocalComponents(bool enable)
         {
-            if (headCamera != null)
-            {
-                headCamera.enabled = enable;
-            }
-
-            if (playerAudioListener != null)
-            {
-                playerAudioListener.enabled = enable;
-            }
-
             if (!debugMultiplayerTesting)
             {
+                if (headCamera != null)
+                {
+                    headCamera.enabled = enable;
+                }
+
+                if (playerAudioListener != null)
+                {
+                    playerAudioListener.enabled = enable;
+                }
+
                 if (xrOrigin != null)
                 {
                     xrOrigin.enabled = enable;
@@ -268,17 +268,17 @@
                 {
                     trackedPoseDriver.enabled = enable;
                 }
-            }
 
-            if (playerRigidBody != null)
-            {
-                if (!enable)
+                if (playerRigidBody != null)
                 {
-                    playerRigidBody.isKinematic = true;
-                }
-                if (enable)
-                {
-                    playerRigidBody.isKinematic = false;
+                    if (!enable)
+                    {
+                        playerRigidBody.isKinematic = true;
+                    }
+                    if (enable)
+                    {
+                        playerRigidBody.isKinematic = false;
+                    }
                 }
             }
         }

@@ -1,9 +1,10 @@
 using Fusion;
 using GorillaLocomotion;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Controls the Status display on the Player's UI canvas. There are different statuses that can be inflicted from various Game Modes, so this tracks the Player's state and displays those status symbols above the player's head for easy
+// recognition of the player's current status(es). Updates layout based on how many are active.
 public class StatusUIDisplayController : NetworkBehaviour
 {
     [SerializeField] private Player player;
@@ -18,6 +19,7 @@ public class StatusUIDisplayController : NetworkBehaviour
 
     private List<RectTransform> allIcons;
 
+    // Fill the list on Spawn.
     public override void Spawned()
     {
         allIcons = new List<RectTransform>
@@ -30,6 +32,7 @@ public class StatusUIDisplayController : NetworkBehaviour
         };
     }
 
+    // If the player isn't null, keep track of that player's state and display the appropriate statuses by turning them active or not based on the status bool being tracked in Player.
     public override void FixedUpdateNetwork()
     {
         if (player == null) return;
@@ -43,6 +46,7 @@ public class StatusUIDisplayController : NetworkBehaviour
         UpdateIconLayout();
     }
 
+    // Updates icon layout at runtime based on how many icons are active and spaces them appropriately so that all are displayed.
     private void UpdateIconLayout()
     {
         List<RectTransform> activeIcons = new List<RectTransform>();

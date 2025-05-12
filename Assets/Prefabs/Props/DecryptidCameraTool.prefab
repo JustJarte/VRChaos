@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 2924027848269639772}
   - component: {fileID: 2250639007496617977}
   - component: {fileID: 4098019514785581875}
+  - component: {fileID: 4066087319567620013}
   m_Layer: 0
   m_Name: DecryptidCamera
   m_TagString: Untagged
@@ -312,3 +313,23 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4066087319567620013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2585043617731472102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49cdb6842fb927347b44e13b62da87c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  decryptidCamera: {fileID: 481849084069407874}
+  cameraRender: {fileID: 8400000, guid: 64d433e5d4609b9468387393e1a82952, type: 2}
+  detectionLayers:
+    serializedVersion: 2
+    m_Bits: 769
+  snapshotOrigin: {fileID: 481849084069407877}
+  snapshotRange: 50
+  snapshotFOV: 60

@@ -9,6 +9,7 @@ using UnityEngine.Events;
 using System.Collections;
 using Random = UnityEngine.Random;
 
+// An Instanced class that handles all NetworkRunner calls and logic, including connecting, spawning, leaving, etc.
 public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkRunnerHandler Instance { get; private set; }
@@ -27,7 +28,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     public List<StringSessionProperty> actualSessionProperties = new List<StringSessionProperty>();
     public List<NetworkObject> cryptidPlayerPrefabs;
     [Tooltip("Only for debug multiplayer testing. Remove when done.")] [SerializeField] private NetworkObject botMultiplayerPrefab;
-    [SerializeField] private NetworkRunner runner;
+    [SerializeField] [HideInInspector] private NetworkRunner runner;
     public GameSettingsSO gameSettings;
     public SpawnLocationsSO spawnLocationCollection;
     public bool connectOnStart = false;
@@ -47,7 +48,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     public NetworkObject UserPrefab { get { return userPrefab; } set { userPrefab = value; } }
     public NetworkRunner InstanceRunner { get { return runner; } }
 
-    // Dictionary of spawned user prefabs, to store them on the server for host topology, and destroy them on disconnection (for shared topology, use Network Objects's "Destroy When State Authority Leaves" option)
+    // Dictionary of spawned user prefabs, to store them on the server for host topology, and destroy them on disconnection (for shared topology, use Network Objects's "Destroy When State Authority Leaves" option).
     private Dictionary<PlayerRef, NetworkObject> _spawnedUsers = new Dictionary<PlayerRef, NetworkObject>();
     private Vector3 startingPos;
     private Quaternion startingRot;
@@ -55,8 +56,9 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkSceneManagerDefault sceneManager;
     private NetworkObject userPrefab;
 
-    private int playerCounter = 0;
+    private int playerCounter = 0; // Used for debugging stuff in the Unity Editor, not actually used in a build.
 
+    // Create Instance.
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -78,6 +80,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // Only works if in the Editor, allows me to create bots for general testing.
     private void Update()
     {
 #if UNITY_EDITOR
@@ -88,6 +91,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 #endif
     }
 
+    // Dictionary of all SessionProperties
     Dictionary<string, SessionProperty> AllConnectionSessionProperties
     {
         get
@@ -116,6 +120,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // Gets the current scene's info, as this object follows the player from scene to scene.
     public virtual NetworkSceneInfo CurrentSceneInfo()
     {
         var activeScene = SceneManager.GetActiveScene();
@@ -140,6 +145,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         return sceneInfo;
     }
 
+    // Handles connecting to an online session of the selected game mode by starting or joining a session with a specific name. Connect is called whenever the Player loads into a game mode scene and its Manager calls Connect on Start.
     public async Task Connect()
     {
         if (runner == null)
@@ -174,26 +180,22 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             sessionProperties["matchStartTime"] = (SessionProperty)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
 
-#if PARRELSYNC
-        gameConnectionMode = GameMode.AutoHostOrClient;
-#else
-        gameConnectionMode = GameMode.AutoHostOrClient;
-#endif
-
         Debug.Log($"[{(Application.isEditor ? "Editor" : "Build")}] GameMode Selected: {gameConnectionMode}");
 
         gameSettings.CreateStartGameArgs(gameConnectionMode, CurrentSceneInfo(), AllConnectionSessionProperties, sceneManager);
 
-        // Start or join (depends on gamemode) a session with a specific name
         var args = gameSettings.GetStartArgs();
 
         await runner.StartGame(args);
     }
 
+    // Handles when a player joins a session.
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         audioSource.PlayOneShot(playerJoined);
 
+        // If a player tries to join a match after a certain amount of time has passed, they get kicked back to the Lobby and are unable to join; this is to prevent players joining a match that has already been going on for some time and disrupting flow or logic. 
+        // Likely will change this to prevent after the countdown amount has hit 0 instead.
         if (runner.Topology == Topologies.ClientServer)
         {
             long matchStartTime = 0;
@@ -226,6 +228,8 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             OnPlayerJoinedSharedMode(runner, player);
         }
     }
+
+    // Handles when a player leaves a session.
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         audioSource.PlayOneShot(playerLeft);
@@ -236,6 +240,8 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // If a player joined and its a hosting mode type, this logic is performed. We spawn the correct player prefab based on their selected Cryptid character in the Lobby, then we get the location to spawn them at via our spawn location collection and the
+    // current game mode, and then once that player is spawned, we add them to the current spawned users list.
     public void OnPlayerJoinedHostMode(NetworkRunner runner, PlayerRef player)
     {
         // The user's prefab has to be spawned by the host
@@ -282,11 +288,11 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             var offset = Vector3.up * 1.5f;
-            NetworkObject networkPlayerObject;
 
             /*if (playerCounter > 0)
             {
                 networkPlayerObject = runner.Spawn(botMultiplayerPrefab, position: startingPos + offset, rotation: startingRot, inputAuthority: player);
+
                 playerCounter++;
             }
             else
@@ -296,14 +302,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
                 playerCounter++;
             }*/
 
-            networkPlayerObject = runner.Spawn(playerPrefab, position: startingPos + offset, rotation: startingRot, inputAuthority: player);
-
-            var typeHandler = networkPlayerObject.GetComponent<CryptidTypeHandler>();
-
-            if (typeHandler != null)
-            {
-                typeHandler.CryptidCharacterType = gameSettings.selectedCryptidCharacter;
-            }
+            NetworkObject networkPlayerObject = runner.Spawn(playerPrefab, position: startingPos + offset, rotation: startingRot, inputAuthority: player);
 
             _spawnedUsers.Add(player, networkPlayerObject);
 
@@ -311,6 +310,8 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // If a player joined and its a sharing mode type, this logic is performed. We spawn the correct player prefab based on their selected Cryptid character in the Lobby, then we get the location to spawn them at via our spawn location collection and the
+    // current game mode, and then once that player is spawned, we add them to the current spawned users list.
     public void OnPlayerJoinedSharedMode(NetworkRunner runner, PlayerRef player)
     {
         if (player == runner.LocalPlayer)
@@ -325,23 +326,45 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
             NetworkObject playerPrefab = cryptidPlayerPrefabs[cryptidCharIndex];
 
-            NetworkObject networkPlayerObject = runner.Spawn(botMultiplayerPrefab, Vector3.zero, Quaternion.identity, player);
+            string positionStringName = "";
 
-            var typeHandler = networkPlayerObject.GetComponent<CryptidTypeHandler>();
-
-            if (typeHandler != null)
+            if (gameSettings.selectedGamePlayMode == GamePlayMode.Tag)
             {
-                typeHandler.CryptidCharacterType = gameSettings.selectedCryptidCharacter;
+                positionStringName = "FreePlayModeStartingPos";// "TagModeStartingCavePos";
             }
+            else if (gameSettings.selectedGamePlayMode == GamePlayMode.Battle)
+            {
+                positionStringName = "BattleModeStartingPos";
+            }
+            else if (gameSettings.selectedGamePlayMode == GamePlayMode.Decryptid)
+            {
+                positionStringName = "DecryptidModeStartingPos";
+            }
+            else if (gameSettings.selectedGamePlayMode == GamePlayMode.FreePlay)
+            {
+                positionStringName = "FreePlayModeStartingPos";
+            }
+
+            for (int i = 0; i < spawnLocationCollection.spawnLocations.Count; i++)
+            {
+                if (spawnLocationCollection.spawnLocations[i].positionName == positionStringName)
+                {
+                    startingPos = spawnLocationCollection.spawnLocations[i].position;
+                    startingRot = spawnLocationCollection.spawnLocations[i].rotation;
+                }
+            }
+
+            var offset = Vector3.up * 1.5f;
+
+            NetworkObject networkPlayerObject = runner.Spawn(playerPrefab, position: startingPos + offset, rotation: startingRot, inputAuthority: player);
 
             Debug.Log($"[Shared] Spawned local player Cryptid {gameSettings.selectedCryptidCharacter} for {player}");
         }
     }
 
-    // Despawn the user object upon disconnection
+    // Despawn the user object upon disconnection and then remove them from the spawned users list.
     public void OnPlayerLeftHostMode(NetworkRunner runner, PlayerRef player)
     {
-        // Find and remove the players avatar (only the host would have stored the spawned game object)
         if (_spawnedUsers.TryGetValue(player, out var networkObject))
         {
             runner.Despawn(networkObject);
@@ -349,19 +372,12 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // Handles spawning a bot for dev testing.
     public void SpawnBotForMultiplayerTesting()
     {
         if (!runner.IsServer)
         {
             Debug.LogWarning("Only the server should spawn bots!");
-            return;
-        }
-
-        int cryptidCharIndex = (int)gameSettings.selectedCryptidCharacter;
-
-        if (cryptidCharIndex < 0 || cryptidCharIndex >= cryptidPlayerPrefabs.Count)
-        {
-            Debug.LogError($"Invalid cryptid character index: {cryptidCharIndex}");
             return;
         }
 
@@ -381,12 +397,14 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("[Fusion] Bot player has been spawned in.");
     }
 
+    // Handles connecting to server.
     public void OnConnectedToServer(NetworkRunner runner)
     {
         audioSource.PlayOneShot(connectedToServer);
 
         Debug.Log("OnConnectedToServer");
     }
+    // Handles server shutdown.
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         audioSource.PlayOneShot(shutdown);
@@ -394,6 +412,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("Shutdown: " + shutdownReason);
         ReturnToGameLobby();
     }
+    // Handles when a player is disconnected from server.
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
         audioSource.PlayOneShot(disconnectedFromServer);
@@ -401,6 +420,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("OnDisconnectedFromServer: " + reason);
         ReturnToGameLobby();
     }
+    // Handles when a player cannot connect to a room.
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
         audioSource.PlayOneShot(connectFailed);
@@ -408,6 +428,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("OnConnectFailed: " + reason);
     }
 
+    // Ends the current online session and returns all users to their lobby.
     public void EndSessionAndReturnToLobby()
     {
         if (runner != null)
@@ -428,6 +449,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // Returns the user to their lobby when the server is shutdown or they disconnect from the server by calling a Coroutine to handle the shift.
     private void ReturnToGameLobby()
     {
         if (SceneManager.GetActiveScene().name != "StartingLobby")
@@ -438,15 +460,18 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // Fades player's view, loads back to the lobby scene, and then resets the HUD and player's view.
     private IEnumerator FadeBackToLobby()
     {
-        yield return new WaitForSeconds(2.0f);
+        MultipurposeHUD.Instance?.FadeToBlack();
+
+        yield return new WaitForSeconds(3.0f);
 
         SceneManager.LoadScene(0);
 
         yield return new WaitForSeconds(2.0f);
 
-        ScreenFader.Instance.ResetHUD();
+        MultipurposeHUD.Instance.ResetHUD();
     }
 
 #region Unused Required INetworkCallbacks

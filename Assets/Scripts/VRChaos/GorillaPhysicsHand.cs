@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// This is an alternative physics-based movement script. Implements real mathematical formulations, PID and Hookes Law to propel and move the Player around. The GorillaLocomotion Player movement sometimes felt off or not precise enough
+// so I included this script as an alternative movement style to test. Currently just sticking with GorillaLocomotion Player for this stage of the project but further research will be made if a change should occur.
 public class GorillaPhysicsHand : MonoBehaviour
 {
     [Header("PID")]

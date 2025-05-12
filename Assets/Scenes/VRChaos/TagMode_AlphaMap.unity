@@ -201,7 +201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c46175b20d8d0f24c8a2027c22f89f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeBeforeStart: 60
+  timeBeforeStart: 180
+  gameSettings: {fileID: 11400000, guid: 9cd55ef6295e0ab4bbaeb1c179dba299, type: 2}
   _GameStarted: 0
   _ActivePlayers: []
   _RabidPlayers: []

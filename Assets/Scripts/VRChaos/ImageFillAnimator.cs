@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+// Animates the filling of an image. Currently used in the Lobby to animate selecting a Game Mode for aesthetic, but could be made more generic for future use.
 public class ImageFillAnimator : MonoBehaviour
 {
     public List<Image> images = new List<Image>();

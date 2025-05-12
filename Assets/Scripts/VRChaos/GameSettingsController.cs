@@ -1,14 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
+// Resets Game Settings to default upon starting game, clearing any populated Collections and additionally, if the player has a preferred character, it automatically sets up the default lobby rig to be that character. 
 public class GameSettingsController : MonoBehaviour
 {
     [SerializeField] private GameSettingsSO gameSettings;
-    [SerializeField] private PreviewCharacter characterPreviewController;
-
-    [Space(10.0f)] public UnityEvent onGameStarted;
+    [SerializeField] private PreviewCharacter previewCharacterController;
 
     private void Awake()
     {
@@ -22,6 +18,6 @@ public class GameSettingsController : MonoBehaviour
 
     private void SetupPreferredCharacter()
     {
-        characterPreviewController.PreviewSelectedRig(gameSettings.selectedCryptidCharacter.ToString());
+        previewCharacterController.PreviewSelectedRig(gameSettings.selectedCryptidCharacter.ToString());
     }
 }

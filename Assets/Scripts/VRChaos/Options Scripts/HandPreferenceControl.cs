@@ -1,0 +1,13 @@
+using UnityEngine;
+
+// Not currently in-use, but was made for extending the options menu capability for a public release. Currenlty I am just saving option settings directly to the ScriptableObject, but
+// in the future, such classes as these could be utilized to make modifying and extensions easier. This one would be linked to the primary hand choice for a player.
+public class HandPreferenceControl : MonoBehaviour
+{
+    public bool isRightHanded = true;
+
+    public void SetRightHanded(bool value)
+    {
+        isRightHanded = value;
+    }
+}
